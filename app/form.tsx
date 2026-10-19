@@ -2,21 +2,23 @@
 
 import { useActionState, useState } from 'react'
 import { daftar } from './actions'
+import InputWA from './input-wa'
 
 type Komsel = { id: number; nama: string }
-type Kelompok = 'dewasa' | 'anak' | 'balita'
-type Orang = { id: number; nama: string; kelompok: Kelompok }
+type Kelompok = 'dewasa' | 'anak'
+type Gender = 'L' | 'P' | ''
+type Orang = { id: number; nama: string; kelompok: Kelompok; gender: Gender }
 
 const MAKS = 40
 
 export default function Form({ eventId, komsel }: { eventId: string; komsel: Komsel[] }) {
   const [state, action, pending] = useActionState(daftar, null)
   const [kategori, setKategori] = useState<'jemaat' | 'tamu'>('jemaat')
-  const [orang, setOrang] = useState<Orang[]>([{ id: 1, nama: '', kelompok: 'dewasa' }])
+  const [orang, setOrang] = useState<Orang[]>([{ id: 1, nama: '', kelompok: 'dewasa', gender: '' }])
   const [nextId, setNextId] = useState(2)
 
   const tambah = () => {
-    setOrang((l) => [...l, { id: nextId, nama: '', kelompok: 'dewasa' }])
+    setOrang((l) => [...l, { id: nextId, nama: '', kelompok: 'dewasa', gender: '' }])
     setNextId((n) => n + 1)
   }
   const hapus = (id: number) => setOrang((l) => l.filter((o) => o.id !== id))
@@ -30,8 +32,7 @@ export default function Form({ eventId, komsel }: { eventId: string; komsel: Kom
 
       <div className="card">
         <h2>Data pendaftar</h2>
-        <label htmlFor="wa">Nomor WhatsApp</label>
-        <input id="wa" name="wa" type="tel" inputMode="tel" placeholder="08xxxxxxxxxx" required />
+        <InputWA id="wa" name="wa" required />
 
         <label>Status</label>
         <div className="choice">
@@ -45,7 +46,7 @@ export default function Form({ eventId, komsel }: { eventId: string; komsel: Kom
           </label>
         </div>
 
-        {kategori === 'jemaat' ? (
+        {kategori === 'jemaat' && (
           <>
             <label htmlFor="komsel_id">Komsel</label>
             <select id="komsel_id" name="komsel_id" defaultValue="" required>
@@ -55,18 +56,13 @@ export default function Form({ eventId, komsel }: { eventId: string; komsel: Kom
               ))}
             </select>
           </>
-        ) : (
-          <>
-            <label htmlFor="diundang_oleh">Diundang oleh (opsional)</label>
-            <input id="diundang_oleh" name="diundang_oleh" type="text" />
-          </>
         )}
       </div>
 
       <div className="card">
         <h2>Yang akan hadir</h2>
         <p className="sub">
-          Isi nama setiap orang, termasuk Anda sendiri dan balita. Balita (0–4 th) dipangku, tidak mendapat kursi.
+          Isi nama setiap orang yang akan hadir, termasuk Anda sendiri.
         </p>
         {orang.map((o, i) => (
           <div key={o.id} style={{ marginBottom: 14 }}>
@@ -81,17 +77,31 @@ export default function Form({ eventId, komsel }: { eventId: string; komsel: Kom
               value={o.nama}
               onChange={(e) => ubah(o.id, { nama: e.target.value })}
             />
-            <select
-              name="peserta_kelompok"
-              aria-label={`Kelompok usia ${o.nama || `orang ke-${i + 1}`}`}
-              value={o.kelompok}
-              onChange={(e) => ubah(o.id, { kelompok: e.target.value as Kelompok })}
-              style={{ marginTop: 6 }}
-            >
-              <option value="dewasa">Dewasa (13 th ke atas)</option>
-              <option value="anak">Anak (5–12 th)</option>
-              <option value="balita">Balita (0–4 th)</option>
-            </select>
+            {/* Nilai dikirim lewat input tersembunyi agar urutannya sejajar dengan nama; radio hanya untuk tampilan */}
+            <input type="hidden" name="peserta_gender" value={o.gender} />
+            <div className="lbl">Gender</div>
+            <div className="choice" role="radiogroup" aria-label={`Gender ${o.nama || `orang ke-${i + 1}`}`}>
+              <label>
+                <input type="radio" name={`gender-${o.id}`} required checked={o.gender === 'L'}
+                  onChange={() => ubah(o.id, { gender: 'L' })} /> Laki-laki
+              </label>
+              <label>
+                <input type="radio" name={`gender-${o.id}`} required checked={o.gender === 'P'}
+                  onChange={() => ubah(o.id, { gender: 'P' })} /> Perempuan
+              </label>
+            </div>
+            <input type="hidden" name="peserta_kelompok" value={o.kelompok} />
+            <div className="lbl">Kategori usia</div>
+            <div className="choice" role="radiogroup" aria-label={`Kategori usia ${o.nama || `orang ke-${i + 1}`}`}>
+              <label>
+                <input type="radio" name={`usia-${o.id}`} required checked={o.kelompok === 'dewasa'}
+                  onChange={() => ubah(o.id, { kelompok: 'dewasa' })} /> Dewasa <span className="sub" style={{ margin: 0 }}>(13 th ke atas)</span>
+              </label>
+              <label>
+                <input type="radio" name={`usia-${o.id}`} required checked={o.kelompok === 'anak'}
+                  onChange={() => ubah(o.id, { kelompok: 'anak' })} /> Anak <span className="sub" style={{ margin: 0 }}>(12 th ke bawah)</span>
+              </label>
+            </div>
             {i > 0 && (
               <button type="button" className="ghost" onClick={() => hapus(o.id)} style={{ marginTop: 6 }}>
                 Hapus
@@ -102,13 +112,6 @@ export default function Form({ eventId, komsel }: { eventId: string; komsel: Kom
         {orang.length < MAKS && (
           <button type="button" className="ghost" onClick={tambah}>+ Tambah orang</button>
         )}
-      </div>
-
-      <div className="card">
-        <label className="check">
-          <input type="checkbox" name="setuju" />
-          <span>Saya setuju data ini dipakai panitia hanya untuk keperluan acara Natal.</span>
-        </label>
       </div>
 
       <button type="submit" disabled={pending}>{pending ? 'Mengirim…' : 'Daftar'}</button>

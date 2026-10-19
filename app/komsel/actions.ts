@@ -2,11 +2,12 @@
 
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
-import { normalisasiWA } from '@/lib/util'
+import { normalisasiWA, pesanWA } from '@/lib/util'
 
 export type FormState = { error?: string } | null
 
-const KELOMPOK = ['dewasa', 'anak', 'balita']
+const KELOMPOK = ['dewasa', 'anak']
+const GENDER = ['L', 'P']
 
 const PESAN: Record<string, string> = {
   PENDAFTARAN_TUTUP: 'Pendaftaran sudah ditutup.',
@@ -22,13 +23,13 @@ export async function masukKomsel(fd: FormData) {
   redirect(`/komsel/${kode}`)
 }
 
-type Keluarga = { wa?: string; peserta?: { nama?: string; kelompok?: string }[] }
+type Keluarga = { wa?: string; peserta?: { nama?: string; kelompok?: string; gender?: string }[] }
 
 export async function daftarKomsel(_prev: FormState, fd: FormData): Promise<FormState> {
   const eventId = String(fd.get('event_id') ?? '')
   const kode = String(fd.get('kode') ?? '')
-  const wa = normalisasiWA(String(fd.get('wa') ?? ''))
-  const setuju = fd.get('setuju') === 'on'
+  const waRaw = String(fd.get('wa') ?? '').trim()
+  const wa = normalisasiWA(waRaw)
 
   let keluarga: Keluarga[]
   try {
@@ -39,23 +40,27 @@ export async function daftarKomsel(_prev: FormState, fd: FormData): Promise<Form
   if (!Array.isArray(keluarga) || keluarga.length === 0) return { error: 'Isi minimal satu keluarga.' }
 
   let total = 0
-  const bersih: { wa: string; peserta: { nama: string; kelompok: string }[] }[] = []
+  const bersih: { wa: string; peserta: { nama: string; kelompok: string; gender: string }[] }[] = []
   for (let i = 0; i < keluarga.length; i++) {
     const peserta = (keluarga[i].peserta ?? []).map((p) => ({
       nama: String(p.nama ?? '').trim(),
       kelompok: String(p.kelompok ?? ''),
+      gender: String(p.gender ?? ''),
     }))
     if (peserta.length === 0) return { error: `Keluarga ${i + 1}: isi minimal satu orang.` }
     if (peserta.some((p) => p.nama.length < 2)) return { error: `Keluarga ${i + 1}: setiap orang wajib diisi namanya.` }
     if (peserta.some((p) => !KELOMPOK.includes(p.kelompok))) return { error: `Keluarga ${i + 1}: pilih kelompok usia.` }
-    const waKel = keluarga[i].wa ? normalisasiWA(String(keluarga[i].wa)) : ''
-    if (waKel && (waKel.length < 10 || waKel.length > 15)) return { error: `Keluarga ${i + 1}: nomor WhatsApp tidak valid.` }
+    if (peserta.some((p) => !GENDER.includes(p.gender))) return { error: `Keluarga ${i + 1}: pilih gender setiap orang.` }
+    const waKelRaw = String(keluarga[i].wa ?? '').trim()
+    const eKel = pesanWA(waKelRaw)
+    if (eKel) return { error: `Keluarga ${i + 1}, nomor WhatsApp: ${eKel}` }
+    const waKel = waKelRaw ? normalisasiWA(waKelRaw) : ''
     total += peserta.length
     bersih.push({ wa: waKel, peserta })
   }
   if (total > 200) return { error: 'Terlalu banyak sekaligus. Kirim dalam beberapa kali.' }
-  if (wa.length < 10 || wa.length > 15) return { error: 'Nomor WhatsApp Gembala Komsel tidak valid.' }
-  if (!setuju) return { error: 'Centang persetujuan penggunaan data.' }
+  if (!waRaw) return { error: 'Nomor WhatsApp Gembala Komsel wajib diisi.' }
+  { const e = pesanWA(waRaw); if (e) return { error: `Nomor WhatsApp Gembala Komsel: ${e}` } }
 
   const { error } = await db().rpc('daftar_komsel', {
     p_event: eventId,
@@ -65,6 +70,7 @@ export async function daftarKomsel(_prev: FormState, fd: FormData): Promise<Form
   })
 
   if (error) {
+    console.error('[daftarKomsel] rpc gagal:', error)
     const kunci = Object.keys(PESAN).find((k) => error.message.includes(k))
     return { error: kunci ? PESAN[kunci] : 'Terjadi kesalahan. Tidak ada data yang tersimpan, coba lagi.' }
   }

@@ -2,6 +2,7 @@
 
 import { useActionState } from 'react'
 import { daftarPelayan } from './actions'
+import InputWA from '../input-wa'
 
 export default function FormPelayan({ eventId, perluKode }: { eventId: string; perluKode: boolean }) {
   const [state, action, pending] = useActionState(daftarPelayan, null)
@@ -21,18 +22,16 @@ export default function FormPelayan({ eventId, perluKode }: { eventId: string; p
         <label htmlFor="nama">Nama lengkap</label>
         <input id="nama" name="nama" type="text" autoComplete="name" required />
 
-        <label htmlFor="wa">Nomor WhatsApp</label>
-        <input id="wa" name="wa" type="tel" inputMode="tel" placeholder="08xxxxxxxxxx" required />
+        <div className="lbl">Gender</div>
+        <div className="choice" role="radiogroup" aria-label="Gender">
+          <label><input type="radio" name="gender" value="L" required /> Laki-laki</label>
+          <label><input type="radio" name="gender" value="P" required /> Perempuan</label>
+        </div>
+
+        <InputWA id="wa" name="wa" required />
 
         <label htmlFor="bidang">Bidang pelayanan</label>
         <input id="bidang" name="bidang" type="text" placeholder="Contoh: Musik, Multimedia, Usher" required />
-      </div>
-
-      <div className="card">
-        <label className="check">
-          <input type="checkbox" name="setuju" />
-          <span>Saya setuju data ini dipakai panitia hanya untuk keperluan acara Natal.</span>
-        </label>
       </div>
 
       <button type="submit" disabled={pending}>{pending ? 'Mengirim…' : 'Daftar'}</button>

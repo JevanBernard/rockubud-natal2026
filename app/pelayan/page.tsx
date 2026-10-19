@@ -1,4 +1,5 @@
 import { db } from '@/lib/supabase'
+import Banner from '../banner'
 import FormPelayan from './form'
 
 export const dynamic = 'force-dynamic'
@@ -14,6 +15,7 @@ export default async function Page() {
 
   return (
     <main>
+      <Banner />
       <h1>Pendaftaran Pelayan</h1>
       <p className="sub">{ev.nama} · khusus pelayan ibadah</p>
 

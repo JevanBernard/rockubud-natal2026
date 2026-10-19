@@ -20,6 +20,6 @@ Stack: Next.js 15 (App Router) + Supabase. Bahasa antarmuka: Indonesia.
 2. DONE (belum dites di Supabase; jalankan supabase/tahap2.sql): jalur Gembala Komsel (input banyak keluarga, kode KOM-xx) dan jalur pelayan
 3. DONE: QR check-in (1 QR per pendaftaran, isi = kode_daftar, hanya status terdaftar) dan pesan konfirmasi WA MANUAL lewat tautan wa.me (keputusan: tanpa provider/gateway pihak ketiga)
 4. DONE (belum dites di Supabase; jalankan supabase/tahap4.sql, isi ADMIN_PASSWORD): dashboard admin /admin (satu kata sandi bersama, cookie HMAC) + export Excel. Perubahan status lewat fungsi SQL ubah_status (atomik, cek kuota)
-5. Halaman scan check-in hari H
+5. DONE (belum dites di perangkat/Supabase): halaman scan check-in hari H di /admin/scan (kamera + jsQR, input manual, check-in per orang, bisa dibatalkan). Pakai sesi admin yang sama
 
 Kerjakan per tahap dan minta konfirmasi sebelum lanjut ke tahap berikutnya.

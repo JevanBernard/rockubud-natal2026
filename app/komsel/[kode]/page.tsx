@@ -1,5 +1,6 @@
 import { db } from '@/lib/supabase'
 import { linkWA, pesanKonfirmasi } from '@/lib/pesan'
+import Banner from '../../banner'
 import FormKomsel from './form'
 
 export const dynamic = 'force-dynamic'
@@ -41,6 +42,7 @@ export default async function Page({
 
   return (
     <main>
+      <Banner />
       <h1>Komsel {km.nama}</h1>
       <p className="sub">{ev.nama} · pendaftaran oleh Gembala Komsel</p>
 

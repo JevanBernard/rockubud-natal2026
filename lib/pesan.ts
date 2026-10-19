@@ -1,3 +1,5 @@
+import { LOKASI_NAMA, LOKASI_URL } from '@/lib/acara'
+
 // Pesan konfirmasi WhatsApp untuk dikirim MANUAL lewat tautan wa.me
 // (tidak ada pengiriman otomatis / pihak ketiga).
 
@@ -24,7 +26,8 @@ export function pesanKonfirmasi(
       : `pendaftaran di ${ev.nama} *berhasil*.`,
     `Kode: *${r.kode_daftar}*`,
     `Waktu: ${fmt(ev.tanggal)}`,
-    ...(ev.lokasi ? [`Tempat: ${ev.lokasi}`] : []),
+    `Tempat: ${ev.lokasi || LOKASI_NAMA}`,
+    `Peta: ${LOKASI_URL}`,
     ...(SITE && !tunggu ? [`QR check-in: ${SITE}/sukses/${r.kode_daftar}`] : []),
     'Simpan pesan ini, kode dipakai saat check-in.',
     'GBI ROCK Ubud',

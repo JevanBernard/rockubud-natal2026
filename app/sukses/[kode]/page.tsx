@@ -9,7 +9,7 @@ export default async function Sukses({ params }: { params: Promise<{ kode: strin
   const sb = db()
   const { data: r } = await sb
     .from('registrations')
-    .select('*, events(nama, tanggal, lokasi), peserta(nama, kelompok)')
+    .select('*, events(nama, tanggal, lokasi), peserta(nama, kelompok, gender)')
     .eq('kode_daftar', kode)
     .single()
 
@@ -54,13 +54,12 @@ export default async function Sukses({ params }: { params: Promise<{ kode: strin
             <tr><td>Nama</td><td>{r.nama}</td></tr>
             <tr><td>Dewasa</td><td>{r.jml_dewasa}</td></tr>
             <tr><td>Anak</td><td>{r.jml_anak}</td></tr>
-            <tr><td>Balita</td><td>{r.jml_balita}</td></tr>
           </tbody>
         </table>
         <h2 style={{ marginTop: 16 }}>Yang hadir</h2>
         <ul>
-          {r.peserta.map((p: { nama: string; kelompok: string }, i: number) => (
-            <li key={i}>{p.nama} <span className="sub">({p.kelompok})</span></li>
+          {r.peserta.map((p: { nama: string; kelompok: string; gender: string | null }, i: number) => (
+            <li key={i}>{p.nama} <span className="sub">({p.kelompok}{p.gender ? `, ${p.gender === 'L' ? 'laki-laki' : 'perempuan'}` : ''})</span></li>
           ))}
         </ul>
         <a href={linkWA(r.wa, pesanKonfirmasi(r, r.events))} target="_blank" rel="noopener noreferrer"

@@ -1,4 +1,6 @@
 import { db } from '@/lib/supabase'
+import { CATATAN, LOKASI_NAMA, LOKASI_URL, PENGANTAR } from '@/lib/acara'
+import Banner from './banner'
 import Form from './form'
 
 export const dynamic = 'force-dynamic'
@@ -25,11 +27,31 @@ export default async function Page() {
 
   return (
     <main>
-      <h1>{ev.nama}</h1>
-      <p className="sub">
-        GBI ROCK Ubud · {fmtTanggal(ev.tanggal)}
-        {ev.lokasi ? ` · ${ev.lokasi}` : ''}
-      </p>
+      <Banner />
+
+      <div className="card judul">
+        <h1>{ev.nama}</h1>
+        <p className="sub" style={{ marginBottom: 12 }}>GBI ROCK Ubud</p>
+        <p style={{ margin: '0 0 12px' }}>{PENGANTAR}</p>
+
+        <table className="info">
+          <tbody>
+            <tr><th>Waktu</th><td>{fmtTanggal(ev.tanggal)}</td></tr>
+            <tr>
+              <th>Lokasi</th>
+              <td>
+                {ev.lokasi || LOKASI_NAMA}
+                <br />
+                <a href={LOKASI_URL} target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <ul className="catatan">
+          {CATATAN.map((c) => <li key={c}>{c}</li>)}
+        </ul>
+      </div>
 
       {tutup ? (
         <div className="err">Pendaftaran sudah ditutup.</div>

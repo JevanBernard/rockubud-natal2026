@@ -1,7 +1,7 @@
 import { wajibAdmin } from '@/lib/admin'
 import { ambilData, asal, rekap, type Reg } from '@/lib/admin-data'
 import { linkWA, pesanKonfirmasi } from '@/lib/pesan'
-import { keluar, simpanPengaturan, ubahStatus } from './actions'
+import { checkInDashboard, keluar, simpanPengaturan, ubahStatus } from './actions'
 
 export const dynamic = 'force-dynamic'
 
@@ -10,6 +10,9 @@ type SP = { q?: string; status?: string; kategori?: string; err?: string; ok?: s
 const LABEL = { terdaftar: 'Terdaftar', daftar_tunggu: 'Daftar tunggu', batal: 'Batal' } as const
 
 // "2026-12-20T09:00" dalam WITA untuk input datetime-local
+const jam = (iso: string) =>
+  new Intl.DateTimeFormat('id-ID', { timeStyle: 'short', timeZone: 'Asia/Makassar' }).format(new Date(iso))
+
 const keInputWITA = (iso: string | null) =>
   iso ? new Date(new Date(iso).getTime() + 8 * 3600_000).toISOString().slice(0, 16) : ''
 
@@ -74,7 +77,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
           <p className="sub" style={{ marginBottom: 8 }}>{ev.nama}</p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
+          <a href="/admin/scan" className="btn mini">Check-in</a>
           <a href="/admin/export" className="btn mini" download>Unduh Excel</a>
+          <a href="/admin/export-pdf" className="btn mini" download>Unduh PDF</a>
           <form action={keluar}><button type="submit" className="ghost mini">Keluar</button></form>
         </div>
       </div>
@@ -93,7 +98,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
         <table className="tbl">
           <tbody>
             <tr><td>Pendaftaran terdaftar</td><td>{k.jumlahTerdaftar}</td></tr>
-            <tr><td>Balita (tanpa kursi)</td><td>{k.balita}</td></tr>
             <tr><td>Daftar tunggu</td><td>{k.jumlahTunggu} pendaftaran ({k.tungguOrang} orang)</td></tr>
             <tr><td>Batal</td><td>{k.jumlahBatal}</td></tr>
             <tr><td>Konsumsi: porsi + cadangan {ev.cadangan_konsumsi_persen}%</td><td>{k.porsi} + {k.cadangan} = <b>{k.totalPorsi}</b></td></tr>
@@ -140,7 +144,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
       <div className="scroll">
         <table className="tbl">
           <thead>
-            <tr><th>Kode</th><th>Pendaftar</th><th>Asal</th><th>D / A / B</th><th>Status</th><th>Aksi</th></tr>
+            <tr><th>Kode</th><th>Pendaftar</th><th>Asal</th><th>Dewasa / Anak</th><th>Status</th><th>Aksi</th></tr>
           </thead>
           <tbody>
             {tampil.map((r) => (
@@ -149,20 +153,70 @@ export default async function Page({ searchParams }: { searchParams: Promise<SP>
                 <td>
                   <details>
                     <summary>{r.nama}{r.peserta.length > 1 ? ` +${r.peserta.length - 1}` : ''}</summary>
-                    <ul className="names">
-                      {r.peserta.map((p, i) => (
-                        <li key={i}>{p.nama} <span className="sub">({p.kelompok}{p.checked_in_at ? ', hadir' : ''})</span></li>
-                      ))}
-                    </ul>
+                    {r.status === 'terdaftar' ? (
+                      // Daftar orang + check-in per orang tanpa membuka menu scan
+                      <form action={checkInDashboard} className="ci">
+                        <input type="hidden" name="id" value={r.id} />
+                        <input type="hidden" name="balik" value={balik} />
+                        {r.peserta.map((p) => (
+                          <label key={p.id} className="check">
+                            <input type="checkbox" name="pid" value={p.id} defaultChecked={!p.checked_in_at} />
+                            <span>
+                              {p.nama} <span className="sub">({p.kelompok}{p.gender ? `, ${p.gender}` : ''})</span>
+                              {p.checked_in_at && <span className="badge ok" style={{ marginLeft: 6 }}>hadir {jam(p.checked_in_at)}</span>}
+                            </span>
+                          </label>
+                        ))}
+                        <div className="aksi" style={{ marginTop: 8 }}>
+                          <button type="submit" name="mode" value="masuk" className="mini">Check-in yang dicentang</button>
+                          <button type="submit" name="mode" value="batal" className="ghost mini">Batalkan check-in</button>
+                        </div>
+                      </form>
+                    ) : (
+                      <ul className="names">
+                        {r.peserta.map((p) => (
+                          <li key={p.id}>{p.nama} <span className="sub">({p.kelompok}{p.gender ? `, ${p.gender}` : ''})</span></li>
+                        ))}
+                      </ul>
+                    )}
                   </details>
                   <span className="sub">{r.wa}</span>
                 </td>
                 <td>{asal(r)}{r.didaftarkan_oleh !== 'mandiri' && <><br /><span className="sub">via {r.didaftarkan_oleh}</span></>}</td>
-                <td>{r.jml_dewasa} / {r.jml_anak} / {r.jml_balita}</td>
-                <td><span className={`badge ${r.status === 'terdaftar' ? 'ok' : 'wait'}`}>{LABEL[r.status]}</span></td>
+                <td>{r.jml_dewasa} / {r.jml_anak}</td>
+                <td>
+                  <span className={`badge ${r.status === 'terdaftar' ? 'ok' : 'wait'}`}>{LABEL[r.status]}</span>
+                  {r.status === 'terdaftar' && (
+                    <><br /><span className="sub">Hadir {r.peserta.filter((p) => p.checked_in_at).length}/{r.peserta.length}</span></>
+                  )}
+                </td>
                 <td className="aksi">
                   <a className="btn ghost mini" target="_blank" rel="noopener noreferrer"
                     href={linkWA(r.wa, pesanKonfirmasi(r, ev))}>WA</a>
+                  {r.status === 'terdaftar' && r.peserta.some((p) => !p.checked_in_at) && (
+                    <form action={checkInDashboard} style={{ display: 'inline' }}>
+                      <input type="hidden" name="id" value={r.id} />
+                      <input type="hidden" name="balik" value={balik} />
+                      <input type="hidden" name="mode" value="masuk" />
+                      {r.peserta.filter((p) => !p.checked_in_at).map((p) => (
+                        <input key={p.id} type="hidden" name="pid" value={p.id} />
+                      ))}
+                      <button type="submit" className="mini">Check-in semua</button>
+                    </form>
+                  )}
+                  {r.status === 'terdaftar' && (
+                    <details className="qr">
+                      <summary className="btn ghost mini">QR</summary>
+                      <div className="qr-box">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={`/admin/qr/${r.kode_daftar}`} alt={`QR ${r.kode_daftar}`} width={200} height={200} loading="lazy" />
+                        <div><b>{r.kode_daftar}</b></div>
+                        <a href={`/admin/qr/${r.kode_daftar}`} download={`${r.kode_daftar}.png`}>Unduh PNG</a>
+                        {' · '}
+                        <a href={`/sukses/${r.kode_daftar}`} target="_blank" rel="noopener noreferrer">Halaman tiket</a>
+                      </div>
+                    </details>
+                  )}
                   {r.status === 'daftar_tunggu' && <>
                     <Tombol r={r} status="terdaftar" label="Terima" />
                     <Tombol r={r} status="terdaftar" label="Terima (abaikan kuota)" paksa />

@@ -53,14 +53,15 @@ create table if not exists peserta (
   registration_id uuid not null references registrations(id) on delete cascade,
   nama text not null,
   kelompok text not null check (kelompok in ('dewasa','anak','balita')),
+  gender text check (gender in ('L','P')),   -- L = laki-laki, P = perempuan
   checked_in_at timestamptz
 );
 create index if not exists idx_peserta_reg on peserta (registration_id);
 
--- Cegah pendaftaran mandiri ganda dengan nomor WA yang sama
-create unique index if not exists uq_reg_mandiri_wa
-  on registrations (event_id, wa)
-  where didaftarkan_oleh = 'mandiri' and status <> 'batal';
+-- Nomor WA boleh dipakai berulang (satu HP bisa mendaftarkan beberapa keluarga),
+-- jadi tidak ada batasan unik. Indeks lama dihapus jika masih ada.
+drop index if exists uq_reg_mandiri_wa;
+create index if not exists idx_reg_wa on registrations (event_id, wa);
 
 -- Akses hanya lewat server (service role). Tidak ada policy publik.
 alter table events enable row level security;
@@ -88,7 +89,7 @@ group by e.id;
 -- Signature berubah (p_peserta jsonb menggantikan jumlah & porsi): hapus versi lama
 drop function if exists daftar_hadir(uuid,text,text,text,int,text,text,text,int,int,int,int,int,text);
 
--- p_peserta: [{"nama":"...","kelompok":"dewasa|anak|balita"}, ...]
+-- p_peserta: [{"nama":"...","kelompok":"dewasa|anak","gender":"L|P"}, ...]
 create or replace function daftar_hadir(
   p_event uuid, p_nama text, p_wa text, p_kategori text,
   p_komsel int, p_diundang text, p_bidang text, p_oleh text,
@@ -115,9 +116,10 @@ begin
   end if;
 
   if exists (
-    select 1 from jsonb_to_recordset(p_peserta) as x(nama text, kelompok text)
+    select 1 from jsonb_to_recordset(p_peserta) as x(nama text, kelompok text, gender text)
      where coalesce(trim(x.nama),'') = ''
-        or x.kelompok not in ('dewasa','anak','balita')
+        or coalesce(x.kelompok,'') not in ('dewasa','anak')
+        or coalesce(x.gender,'') not in ('L','P')
   ) then
     raise exception 'NAMA_PESERTA_KOSONG';
   end if;
@@ -126,7 +128,7 @@ begin
          count(*) filter (where kelompok='anak'),
          count(*) filter (where kelompok='balita')
     into p_dewasa, p_anak, p_balita
-    from jsonb_to_recordset(p_peserta) as x(nama text, kelompok text);
+    from jsonb_to_recordset(p_peserta) as x(nama text, kelompok text, gender text);
 
   if p_kategori in ('jemaat','tamu') then
     select coalesce(sum(jml_dewasa),0), coalesce(sum(jml_anak),0)
@@ -160,21 +162,15 @@ begin
       ) returning id into reg_id;
       exit;
     exception when unique_violation then
+      -- satu-satunya unique selain id adalah kode_daftar: tabrakan kode acak, coba kode lain
       coba := coba + 1;
-      -- bedakan tabrakan kode dengan pendaftaran ganda
-      if exists (select 1 from registrations
-                  where event_id = p_event and wa = p_wa
-                    and didaftarkan_oleh = 'mandiri'
-                    and registrations.status <> 'batal') and coalesce(p_oleh,'mandiri') = 'mandiri' then
-        raise exception 'SUDAH_TERDAFTAR';
-      end if;
       if coba > 5 then raise; end if;
     end;
   end loop;
 
-  insert into peserta (registration_id, nama, kelompok)
-  select reg_id, trim(x.nama), x.kelompok
-    from jsonb_to_recordset(p_peserta) as x(nama text, kelompok text);
+  insert into peserta (registration_id, nama, kelompok, gender)
+  select reg_id, trim(x.nama), x.kelompok, x.gender
+    from jsonb_to_recordset(p_peserta) as x(nama text, kelompok text, gender text);
 
   return query select k, st;
 end $$;
@@ -183,8 +179,8 @@ revoke all on function daftar_hadir(uuid,text,text,text,int,text,text,text,jsonb
 
 -- ============ DATA AWAL ============
 
-insert into events (nama, tanggal, kuota_dewasa, kuota_anak, kuota_pelayan)
-select 'Natal GBI ROCK Ubud 2026', '2026-12-20 09:00:00+08', 150, 75, 50
+insert into events (nama, tanggal, lokasi, kuota_dewasa, kuota_anak, kuota_pelayan)
+select 'Natal GBI ROCK Ubud 2026', '2026-12-20 09:00:00+08', 'The Westin Resort & Spa Ubud, Bali', 150, 75, 50
 where not exists (select 1 from events);
 
 insert into komsel (nama, kode, urutan) values

@@ -3,6 +3,7 @@
 import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { db } from '@/lib/supabase'
+import { terapkanCheckIn } from '@/lib/checkin'
 import { COOKIE_ADMIN, MASA_SESI_DETIK, passwordBenar, tokenSesi, wajibAdmin } from '@/lib/admin'
 
 export async function masuk(fd: FormData) {
@@ -67,4 +68,19 @@ export async function simpanPengaturan(fd: FormData) {
     .eq('id', eventId)
   if (error) redirect('/admin?err=' + encodeURIComponent('Gagal menyimpan pengaturan.'))
   redirect('/admin?ok=' + encodeURIComponent('Pengaturan tersimpan.'))
+}
+
+// Check-in langsung dari dashboard. mode: 'masuk' (tandai hadir) atau 'batal' (hapus tanda hadir).
+export async function checkInDashboard(fd: FormData) {
+  await wajibAdmin()
+  const id = String(fd.get('id') ?? '')
+  const ids = fd.getAll('pid').map(String)
+  const batal = fd.get('mode') === 'batal'
+  const balik = aman(String(fd.get('balik') ?? '/admin'))
+  const sep = balik.includes('?') ? '&' : '?'
+
+  const hasil = await terapkanCheckIn(id, ids, batal)
+  if ('error' in hasil) redirect(`${balik}${sep}err=${encodeURIComponent(hasil.error)}`)
+  const teks = batal ? `Check-in dibatalkan (${hasil.jumlah} orang).` : `Check-in berhasil (${hasil.jumlah} orang).`
+  redirect(`${balik}${sep}ok=${encodeURIComponent(teks)}`)
 }
