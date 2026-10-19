@@ -1,0 +1,124 @@
+/* ===== Penyesuaian responsif lintas halaman + halaman komsel/pelayan/login =====
+   Dimuat paling akhir. Titik patah: 360 / 480 / 640 / 768 / 960 / 1536 px. */
+
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: hidden; }
+img, video, canvas { max-width: 100%; }
+
+/* ---- Komponen tambahan untuk halaman komsel / pelayan / login ---- */
+.halaman-awal { margin-top: 16px; }
+.nomor svg { width: 12px; height: 12px; }
+.shell input[type=password] { padding: 11px 12px; font-size: .88rem; border: 1px solid #e7e5e4; border-radius: 12px; background: rgba(250, 250, 249, .6); }
+.shell input[type=password]:focus { outline: 0; background: #fff; border-color: var(--magenta); box-shadow: 0 0 0 1px var(--magenta); }
+.hero.kecil { aspect-ratio: 3 / 1; }
+.pesan-ok { display: flex; align-items: center; gap: 8px; padding: 12px 14px; border-radius: 12px; background: #ecfdf5; border: 1px solid #a7f3d0; color: #1b6b40; font-size: .85rem; font-weight: 600; }
+.pesan-ok svg { width: 18px; height: 18px; flex-shrink: 0; }
+.kosong-teks { margin: 0; font-size: .85rem; color: #686158; }
+.keluarga { background: #fdfbf7; }
+.shell .keluarga .kartu-kepala p { margin-left: 28px; }
+.daftar-keluarga { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.daftar-keluarga > li { display: grid; gap: 8px; padding: 14px; border-radius: 12px; background: #faf7f2; }
+.df-kepala { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.kode-chip { padding: 2px 8px; border-radius: 4px; background: #ffd9dd; color: #660624; font-size: .8rem; font-weight: 700; letter-spacing: .08em; }
+.df-nama { list-style: none; margin: 0; padding: 0; font-size: .85rem; }
+.df-nama li { padding: 2px 0; overflow-wrap: anywhere; }
+.df-nama small { color: #686158; }
+.aksi-wa.kecil { min-height: 44px; font-size: .8rem; text-align: center; box-shadow: none; }
+.aksi-wa.kecil svg { width: 18px; height: 18px; }
+
+/* ---- Aman untuk notch / bilah gestur ---- */
+.topbar { padding-top: max(6px, env(safe-area-inset-top)); padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+.shell { padding-bottom: env(safe-area-inset-bottom); }
+
+/* ---- Layar sangat kecil (≤ 380px) ---- */
+@media (max-width: 380px) {
+  .isi { padding-left: 12px; padding-right: 12px; }
+  .shell .kartu { padding: 14px; }
+  .kartu-acara { padding: 16px; }
+  .kuota-grid { gap: 8px; }
+  .kuota-kartu { padding: 12px; }
+  .kuota-n { font-size: 1.4rem; }
+  .aksi-dua { grid-template-columns: 1fr; }
+  .kode-tiket { letter-spacing: .08em; }
+  .topbar-merek span:not(.logo) { font-size: .68rem; letter-spacing: .08em; }
+  .status-chip { font-size: .6rem; padding: 3px 8px; }
+}
+
+/* ---- Ponsel (≤ 640px): input 16px agar iOS tidak memperbesar layar saat fokus ---- */
+@media (max-width: 640px) {
+  .shell input[type=text], .shell input[type=tel], .shell input[type=password], .shell select,
+  .sc-manual input, .ad .ad-in { font-size: 16px; }
+  .shell input[type=text], .shell input[type=tel], .shell input[type=password], .shell select { min-height: 48px; }
+  .pil label { font-size: .78rem; }
+  .jalur-khusus > div { grid-template-columns: 1fr; }
+  .sc-isi { padding-left: 12px; padding-right: 12px; }
+  .sc-kontrol button { font-size: .8rem; padding: 0 8px; }
+}
+
+/* ---- Tablet ke atas (≥ 640px): kolom publik melebar sesuai DESIGN.md (560px) ---- */
+@media (min-width: 640px) {
+  .shell { max-width: 560px; }
+  .topbar { padding-top: 8px; }
+  .isi { padding-left: 24px; padding-right: 24px; }
+  .hero.kecil { aspect-ratio: 4 / 1; }
+  .kaki { padding-bottom: 40px; }
+}
+@media (min-width: 768px) {
+  .sc { max-width: 640px; }
+  .sc-isi { padding-top: 20px; }
+}
+
+/* ---- Ponsel mendatar / layar pendek: kamera tidak boleh lebih tinggi dari layar ---- */
+.sc-layar { width: min(100%, 70vh); margin-inline: auto; }
+@media (max-height: 520px) and (orientation: landscape) {
+  .sc-layar { width: min(100%, 62vh); }
+  .hero { aspect-ratio: 21 / 6; }
+}
+
+/* ---- Admin ---- */
+@media (min-width: 1536px) { .ad-isi { max-width: 1320px; } }
+.ad-menu-isi { max-width: calc(100vw - 32px); }
+.ad-atas b { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+@media (max-width: 700px) {
+  .ad-hero-aksi { width: 100%; }
+  .ad-hero-aksi > * { flex: 1 1 100%; }
+  .ad-hero-aksi .ad-btn { width: 100%; min-height: 48px; }
+  .ad-menu-isi { left: 0; right: 0; width: auto; }
+  .ad-filter { gap: 8px; }
+  .ad .ad-cari { flex-basis: 100%; }
+  .ad select.ad-in { flex: 1 1 calc(50% - 4px); }
+  .ad-filter .ad-btn { flex: 1 1 auto; min-height: 46px; }
+  .ad-setelan-form { flex-direction: column; align-items: stretch; }
+  .ad-setelan summary { padding: 14px 16px; flex-wrap: wrap; }
+  .ad-presensi-isi { flex-direction: column; align-items: stretch; }
+  .ad-donat { align-self: center; }
+  .ad-kartu { padding: 16px; }
+
+  /* Tabel menjadi kartu per pendaftaran */
+  .ad-gulir { border: 0; overflow: visible; }
+  .ad .ad-tabel { min-width: 0; }
+  .ad-tabel thead { display: none; }
+  .ad-tabel, .ad-tabel tbody, .ad-tabel tr, .ad .ad-tabel td { display: block; }
+  .ad-tabel tbody { display: grid; gap: 12px; }
+  .ad-tabel tr { border: 1px solid var(--garis); border-radius: 12px; background: #fff; overflow: hidden; }
+  .ad-tabel tr.tunggu { background: #fffaf9; }
+  .ad .ad-tabel td, .ad .ad-tabel td.tengah, .ad .ad-tabel td.kanan, .ad .ad-tabel td:last-child { padding: 10px 14px; border-top: 1px solid #fff0f1; text-align: left; }
+  .ad .ad-tabel td:first-child { border-top: 0; background: var(--krem); }
+  .ad .ad-tabel td:nth-child(n+3)::before { display: block; margin-bottom: 4px; color: var(--redup); font-size: .64rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .ad .ad-tabel td:nth-child(3)::before { content: 'Asal'; }
+  .ad .ad-tabel td:nth-child(4)::before { content: 'Kursi'; }
+  .ad .ad-tabel td:nth-child(5)::before { content: 'Status'; }
+  .ad .ad-tabel td:nth-child(6)::before { content: 'Aksi'; }
+  .ad-aksi { justify-content: flex-start; }
+  .ad .ad-tabel td.kosong { text-align: center; }
+  .ad-qr-kotak { right: auto; left: 0; }
+}
+@media (max-width: 480px) {
+  .ad-atas { padding: 0 12px; }
+  .ad-isi { padding: 12px; }
+  .ad-hero { padding: 16px; }
+  .ad-kursi-angka .besar { font-size: 1.7rem; }
+  .ad-kotak b { font-size: 1.3rem; }
+  .ad select.ad-in { flex-basis: 100%; }
+}

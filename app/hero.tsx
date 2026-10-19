@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 // Gambar hero: taruh di public/banner.jpg (disarankan 1600 x 900 px, rasio 16:9).
 // Selama file belum ada, yang tampil hanya latar gradasi merah anggur.
-export function Hero() {
+export function Hero({ kecil }: { kecil?: boolean }) {
   const [ada, setAda] = useState(true)
   return (
-    <section className="hero" aria-hidden={!ada ? true : undefined}>
+    <section className={kecil ? 'hero kecil' : 'hero'} aria-hidden={!ada ? true : undefined}>
       {ada && (
         // eslint-disable-next-line @next/next/no-img-element
         <img src="/banner.jpg" alt="Ibadah Natal GBI ROCK Ubud 2026" onError={() => setAda(false)} />

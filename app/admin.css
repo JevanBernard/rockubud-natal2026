@@ -18,6 +18,17 @@
 .ad-btn.bahaya { background: var(--merah-muda); color: var(--merah); }
 .ad-btn.putih svg:first-child { color: var(--emas); }
 
+/* Hamburger, laci, dan tombol tutup: hanya tampil di layar sempit */
+.ad-side-bungkus { display: contents; }
+.ad-latar, .ad-hamburger, .ad-tutup { display: none; }
+.ad-hamburger { width: 44px; height: 44px; margin-left: -8px; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--m); cursor: pointer; }
+.ad-hamburger:hover { background: #fde9ea; }
+.ad-hamburger svg { width: 24px; height: 24px; }
+.ad-tutup { width: 40px; height: 40px; margin-left: auto; place-items: center; padding: 0; border: 0; border-radius: 8px; background: transparent; color: #564244; cursor: pointer; }
+.ad-tutup:hover { background: #f8e3e5; }
+.ad-tutup svg { width: 22px; height: 22px; }
+@media (prefers-reduced-motion: reduce) { .ad-side, .ad-latar { transition: none !important; } }
+
 /* Sidebar */
 .ad-side { position: fixed; inset: 0 auto 0 0; width: 256px; z-index: 50; display: flex; flex-direction: column; gap: 20px; padding: 20px 16px; background: #fff0f1; box-shadow: 1px 0 8px rgba(0, 0, 0, .04); overflow-y: auto; }
 .ad-merek { display: flex; align-items: center; gap: 10px; padding: 0 4px; }
@@ -209,14 +220,15 @@
 /* Layar sempit: sidebar menjadi bilah atas */
 @media (max-width: 960px) {
   .ad { display: block; }
-  .ad-side { position: static; width: auto; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 10px 16px; overflow: visible; }
-  .ad-chip-status { margin-left: 0; }
-  .ad-nav { display: flex; order: 3; width: 100%; overflow-x: auto; gap: 6px; }
-  .ad-nav a { flex-shrink: 0; min-height: 40px; }
-  .ad-keluar { margin: 0 0 0 auto; }
-  .ad-keluar button { width: auto; }
+  /* Sidebar menjadi laci yang dibuka lewat tombol hamburger */
+  .ad-side { width: min(288px, 85vw); z-index: 70; transform: translateX(-100%); visibility: hidden; box-shadow: none; padding-top: max(20px, env(safe-area-inset-top)); transition: transform .25s ease, visibility 0s linear .25s; }
+  .ad.menu-buka .ad-side { transform: none; visibility: visible; box-shadow: 0 0 40px rgba(35, 25, 26, .3); transition: transform .25s ease, visibility 0s; }
+  .ad-latar { display: block; position: fixed; inset: 0; z-index: 60; background: rgba(35, 25, 26, .5); opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .ad.menu-buka .ad-latar { opacity: 1; pointer-events: auto; }
+  .ad-tutup { display: grid; }
+  .ad-hamburger { display: grid; }
   .ad-kanan { margin-left: 0; }
-  .ad-atas { position: static; padding: 0 16px; height: 52px; }
+  .ad-atas { padding: 0 12px; height: 56px; }
   .ad-isi { padding: 16px; gap: 16px; }
   .ad-grid3, .ad-dua { grid-template-columns: 1fr; }
   .ad-konsumsi-grid { grid-template-columns: 1fr; }

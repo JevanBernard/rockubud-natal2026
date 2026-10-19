@@ -3,6 +3,7 @@ import './form-publik.css'
 import './tiket.css'
 import './scan.css'
 import './admin.css'
+import './responsif.css'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Pendaftaran kehadiran Ibadah Natal GBI ROCK Ubud 2026',
 }
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#852139' }
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#852139' }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

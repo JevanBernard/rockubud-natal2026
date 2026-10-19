@@ -38,3 +38,4 @@ export const IkonMakan = () => <svg {...dasar}><path d="M3 2v7c0 1.1.9 2 2 2h2a2
 export const IkonQR = () => <svg {...dasar}><rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" /><rect x="3" y="14" width="7" height="7" rx="1" /><path d="M14 14h3v3h-3zM20 14v.01M14 20h3M20 17v4" /></svg>
 export const IkonPasir = () => <svg {...dasar}><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2" /></svg>
 export const IkonMenuBawah = () => <svg {...dasar}><path d="m6 9 6 6 6-6" /></svg>
+export const IkonHamburger = () => <svg {...dasar}><path d="M4 6h16M4 12h16M4 18h16" /></svg>
