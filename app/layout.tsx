@@ -2,6 +2,7 @@ import './globals.css'
 import './form-publik.css'
 import './tiket.css'
 import './scan.css'
+import './admin.css'
 import type { Metadata, Viewport } from 'next'
 
 export const metadata: Metadata = {
