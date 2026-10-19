@@ -1,6 +1,7 @@
 import { db } from '@/lib/supabase'
 import { CATATAN, LOKASI_NAMA, LOKASI_URL, PENGANTAR } from '@/lib/acara'
-import { Hero, Logo } from './hero'
+import { Hero } from './hero'
+import Topbar from './topbar'
 import { IkonInfo, IkonKalender, IkonPeta, IkonTautan } from './icons'
 import Form from './form'
 
@@ -44,15 +45,7 @@ export default async function Page() {
 
   return (
     <div className="shell">
-      <header className="topbar">
-        <div className="topbar-merek">
-          <Logo />
-          <span>GBI ROCK UBUD</span>
-        </div>
-        <span className={`status-chip ${tutup ? 'tutup' : 'buka'}`}>
-          <i />{tutup ? 'Pendaftaran Ditutup' : 'Pendaftaran Dibuka'}
-        </span>
-      </header>
+      <Topbar chip={{ teks: tutup ? 'Pendaftaran Ditutup' : 'Pendaftaran Dibuka', jenis: tutup ? 'tutup' : 'buka' }} />
 
       <Hero />
 

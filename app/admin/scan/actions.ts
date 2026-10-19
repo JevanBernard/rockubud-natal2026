@@ -76,3 +76,10 @@ export async function checkIn(regId: string, pesertaIds: string[], batal: boolea
   if ('error' in hasil) return { error: hasil.error }
   return muat({ id: regId })
 }
+
+// Angka hadir/total saat halaman scan dibuka (sebelum ada yang di-scan)
+export async function hitungAwal(): Promise<Hitung | null> {
+  await wajibAdmin()
+  const { data: ev } = await db().from('events').select('id').order('tanggal').limit(1).maybeSingle()
+  return ev ? hitung(ev.id) : null
+}

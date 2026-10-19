@@ -15,3 +15,17 @@ export const IkonWA = () => (
     <path d="M.057 24l1.687-6.163A11.9 11.9 0 0 1 .157 11.89C.16 5.334 5.495 0 12.05 0c3.181 0 6.167 1.24 8.413 3.488a11.82 11.82 0 0 1 3.48 8.414c-.003 6.557-5.338 11.892-11.893 11.892a11.9 11.9 0 0 1-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884 0 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981z" />
   </svg>
 )
+export const IkonKamera = () => <svg {...dasar}><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" /></svg>
+export const IkonUnduh = () => <svg {...dasar}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" /></svg>
+export const IkonGrup = () => <svg {...dasar}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM19 8v6M22 11h-6" /></svg>
+export const IkonCek = () => <svg {...dasar}><circle cx="12" cy="12" r="10" /><path d="m8 12 3 3 5-6" /></svg>
+export const IkonJam = () => <svg {...dasar}><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
+export const IkonScan = () => <svg {...dasar}><path d="M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2M7 12h10" /></svg>
+export const IkonKembali = () => <svg {...dasar}><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
+export const IkonSenter = () => <svg {...dasar}><path d="M18 6c0 2-2 2-2 4v10a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2V10c0-2-2-2-2-4V2h12zM6 5h12M12 12v3" /></svg>
+export const IkonBalik = () => <svg {...dasar}><path d="M3 12a9 9 0 0 1 15-6.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-15 6.7L3 16M3 21v-5h5" /></svg>
+export const IkonCari = () => <svg {...dasar}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" /></svg>
+export const IkonRiwayat = () => <svg {...dasar}><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2" /></svg>
+export const IkonHadir = () => <svg {...dasar}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM16 11l2 2 4-4" /></svg>
+export const IkonSilang = () => <svg {...dasar}><path d="M18 6 6 18M6 6l12 12" /></svg>
+export const IkonVerifikasi = () => <svg {...dasar}><path d="M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76z" /><path d="m9 12 2 2 4-4" /></svg>
