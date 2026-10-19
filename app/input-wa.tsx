@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { pesanWA } from '@/lib/util'
+import { IkonWA } from './icons'
 
 // Kolom nomor WhatsApp dengan peringatan langsung saat mengetik.
 // Format: hanya angka, diawali 08 (contoh 081234567890).
@@ -28,6 +29,8 @@ export default function InputWA({
   return (
     <>
       <label htmlFor={id}>{label}</label>
+      <div className="wa-field">
+      <span className="wa-ikon"><IkonWA /></span>
       <input
         ref={ref}
         id={id}
@@ -44,6 +47,7 @@ export default function InputWA({
         onBlur={() => setSudahBlur(true)}
         onChange={(e) => { setNilai(e.target.value); onValue?.(e.target.value) }}
       />
+      </div>
       <div id={`${id}-info`} role="alert" className={tampilPesan ? 'wa-err' : 'wa-hint'}>
         {tampilPesan ?? 'Hanya angka, diawali 08. Contoh: 081234567890'}
       </div>

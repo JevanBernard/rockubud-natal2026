@@ -1,15 +1,32 @@
 import { db } from '@/lib/supabase'
 import { CATATAN, LOKASI_NAMA, LOKASI_URL, PENGANTAR } from '@/lib/acara'
-import Banner from './banner'
+import { Hero, Logo } from './hero'
+import { IkonInfo, IkonKalender, IkonPeta, IkonTautan } from './icons'
 import Form from './form'
 
 export const dynamic = 'force-dynamic'
 
-const fmtTanggal = (iso: string) =>
-  new Intl.DateTimeFormat('id-ID', {
-    weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
-    hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Makassar',
-  }).format(new Date(iso)) + ' WITA'
+const fmt = (iso: string, o: Intl.DateTimeFormatOptions) =>
+  new Intl.DateTimeFormat('id-ID', { ...o, timeZone: 'Asia/Makassar' }).format(new Date(iso))
+
+function Kuota({ judul, sisa, total, warna }: { judul: string; sisa: number; total: number; warna: 'a' | 'b' }) {
+  const terisi = total ? Math.min(100, Math.round(((total - sisa) / total) * 100)) : 100
+  return (
+    <div className="kuota-kartu">
+      <div className="kuota-atas">
+        <b>{judul}</b>
+        <span className="kuota-max">{total} maks.</span>
+      </div>
+      <div className="kuota-angka">
+        <span className={`kuota-n ${warna}`}>{sisa}</span> kursi sisa
+      </div>
+      <div className="bar" role="progressbar" aria-valuenow={terisi} aria-valuemin={0} aria-valuemax={100} aria-label={`${judul} terisi`}>
+        <div className={`bar-isi ${warna}`} style={{ width: `${terisi}%` }} />
+      </div>
+      <span className="kuota-ket">Terisi {terisi}%</span>
+    </div>
+  )
+}
 
 export default async function Page() {
   const sb = db()
@@ -26,50 +43,91 @@ export default async function Page() {
   const penuh = sisaDewasa === 0 || sisaAnak === 0
 
   return (
-    <main>
-      <Banner />
+    <div className="shell">
+      <header className="topbar">
+        <div className="topbar-merek">
+          <Logo />
+          <span>GBI ROCK UBUD</span>
+        </div>
+        <span className={`status-chip ${tutup ? 'tutup' : 'buka'}`}>
+          <i />{tutup ? 'Pendaftaran Ditutup' : 'Pendaftaran Dibuka'}
+        </span>
+      </header>
 
-      <div className="card judul">
-        <h1>{ev.nama}</h1>
-        <p className="sub" style={{ marginBottom: 12 }}>GBI ROCK Ubud</p>
-        <p style={{ margin: '0 0 12px' }}>{PENGANTAR}</p>
+      <Hero />
 
-        <table className="info">
-          <tbody>
-            <tr><th>Waktu</th><td>{fmtTanggal(ev.tanggal)}</td></tr>
-            <tr>
-              <th>Lokasi</th>
-              <td>
-                {ev.lokasi || LOKASI_NAMA}
-                <br />
-                <a href={LOKASI_URL} target="_blank" rel="noopener noreferrer">Buka di Google Maps</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <main className="isi">
+        <section className="kartu kartu-acara">
+          <span className="lencana">✦ Ibadah Natal 2026</span>
+          <h1>{ev.nama}</h1>
+          <p className="pengantar">{PENGANTAR}</p>
 
-        <ul className="catatan">
-          {CATATAN.map((c) => <li key={c}>{c}</li>)}
-        </ul>
-      </div>
-
-      {tutup ? (
-        <div className="err">Pendaftaran sudah ditutup.</div>
-      ) : (
-        <>
-          <div className="quota">
-            <div><b>{sisaDewasa}</b><span>sisa kursi dewasa</span></div>
-            <div><b>{sisaAnak}</b><span>sisa kursi anak</span></div>
-          </div>
-          {penuh && (
-            <div className="note">
-              Kuota sudah penuh untuk salah satu kategori. Pendaftaran Anda tetap diterima
-              sebagai <b>daftar tunggu</b> dan panitia akan menghubungi jika ada kursi kosong.
+          <div className="info-baris">
+            <span className="info-ikon magenta"><IkonKalender /></span>
+            <div>
+              <b>{fmt(ev.tanggal, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</b>
+              <span>Pukul {fmt(ev.tanggal, { hour: '2-digit', minute: '2-digit' }).replace(':', '.')} WITA</span>
             </div>
-          )}
-          <Form eventId={ev.id} komsel={komsel ?? []} />
-        </>
-      )}
-    </main>
+          </div>
+          <div className="info-baris">
+            <span className="info-ikon emas"><IkonPeta /></span>
+            <div>
+              <b>{ev.lokasi || LOKASI_NAMA}</b>
+              <a href={LOKASI_URL} target="_blank" rel="noopener noreferrer">
+                Buka di Google Maps <IkonTautan />
+              </a>
+            </div>
+          </div>
+
+          <details className="catatan-lipat">
+            <summary>
+              <IkonInfo /> {CATATAN.length} Informasi Penting Ibadah
+              <span className="panah" aria-hidden="true">▾</span>
+            </summary>
+            <ul>{CATATAN.map((c) => <li key={c}>{c}</li>)}</ul>
+          </details>
+        </section>
+
+        {tutup ? (
+          <div className="err">Pendaftaran sudah ditutup.</div>
+        ) : (
+          <>
+            <section aria-label="Ketersediaan kuota kursi">
+              <div className="judul-kecil">
+                <h2><i /> Ketersediaan Kuota Kursi</h2>
+                <span>Terbaru saat halaman dibuka</span>
+              </div>
+              <div className="kuota-grid">
+                <Kuota judul="Dewasa (13+)" sisa={sisaDewasa} total={ev.kuota_dewasa} warna="a" />
+                <Kuota judul="Anak (≤12)" sisa={sisaAnak} total={ev.kuota_anak} warna="b" />
+              </div>
+              <div className={`kuota-info ${penuh ? 'penuh' : ''}`}>
+                <IkonInfo />
+                <p>
+                  {penuh
+                    ? <>Kuota salah satu kategori sudah penuh. Pendaftaran Anda tetap diterima sebagai <b>Daftar Tunggu</b>; panitia akan menghubungi jika ada kursi kosong.</>
+                    : <>Jika kuota habis, pendaftaran Anda tetap diterima dengan status <b>Daftar Tunggu</b>.</>}
+                </p>
+              </div>
+            </section>
+
+            <Form eventId={ev.id} komsel={komsel ?? []} />
+          </>
+        )}
+
+        <section className="jalur-khusus">
+          <p>Pendaftaran Khusus Internal</p>
+          <div>
+            <a href="/pelayan">Jalur Pelayan Ibadah</a>
+            <a href="/komsel">Jalur Gembala Komsel</a>
+          </div>
+        </section>
+      </main>
+
+      <footer className="kaki">
+        <b>GBI ROCK UBUD</b>
+        <p>“Damai Sejahtera dan Sukacita Natal Kiranya Tinggal di Hati Kita Bersama.”</p>
+      </footer>
+    </div>
   )
 }

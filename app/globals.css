@@ -1,9 +1,9 @@
 :root {
-  --bg: #faf7f2;
+  --bg: #f6f5f2;
   --card: #ffffff;
   --ink: #1f2430;
   --muted: #6b7280;
-  --accent: #9b1c1c;
+  --accent: #852139;
   --line: #e5e0d8;
   --ok: #166534;
   --warn: #92400e;
@@ -11,7 +11,7 @@
 * { box-sizing: border-box; }
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   background: var(--bg);
   color: var(--ink);
   line-height: 1.5;
