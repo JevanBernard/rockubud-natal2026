@@ -148,7 +148,9 @@
 .ad-setelan summary > span:nth-child(2) { flex: 1; }
 .ad-setelan summary b { display: block; font-size: .95rem; }
 .ad-setelan-ikon { width: 36px; height: 36px; border-radius: 8px; display: grid; place-items: center; background: var(--m); color: #fff; }
-.ad-setelan-form { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px 24px; padding: 4px 20px 20px; border-top: 1px solid var(--garis); padding-top: 16px; }
+.ad-setelan-form { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: end; gap: 16px 24px; padding: 16px 20px 20px; border-top: 1px solid var(--garis); }
+.ad-setelan-form > * { min-width: 0; }
+.ad-setelan-form .ad-btn { width: 100%; min-height: 48px; }
 .ad-sakelar { display: flex; align-items: center; gap: 10px; margin: 0; min-height: 48px; padding: 0 16px; border-radius: 8px; background: var(--krem); font-size: .85rem; font-weight: 700; cursor: pointer; }
 .ad-sakelar input { width: 20px; height: 20px; margin: 0; accent-color: var(--hijau); }
 .ad-medan { display: grid; gap: 4px; }

@@ -89,7 +89,7 @@ img, video, canvas { max-width: 100%; }
   .ad .ad-cari { flex-basis: 100%; }
   .ad select.ad-in { flex: 1 1 calc(50% - 4px); }
   .ad-filter .ad-btn { flex: 1 1 auto; min-height: 46px; }
-  .ad-setelan-form { flex-direction: column; align-items: stretch; }
+  .ad-setelan-form { grid-template-columns: minmax(0, 1fr); align-items: stretch; }
   .ad-setelan summary { padding: 14px 16px; flex-wrap: wrap; }
   .ad-presensi-isi { flex-direction: column; align-items: stretch; }
   .ad-donat { align-self: center; }
